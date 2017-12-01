@@ -1,10 +1,5 @@
 (function ($) {  
 
-  //check for github     
-  if (!(window.location.hostname.indexOf('github.com') >= 0)) {
-    return;
-  }
-
   function GhHelper() {
     var self = this;
     self.$wrapper = $('body');

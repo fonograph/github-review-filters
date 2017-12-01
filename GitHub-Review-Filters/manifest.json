@@ -21,13 +21,10 @@
       "content/jquery-2.1.1.min.js",
       "content/inject.js"
     ],
-    "matches": [
-      "https://*.com/*/*/issues*",
-      "https://*.org/*/*/issues*",
-      "https://*.us/*/*/issues*",
-      "https://*.com/*/*/pull*",
-      "https://*.org/*/*/pull*",
-      "https://*.us/*/*/pull*"
+    "matches": [      
+      "https://*.com/*/*/pull",
+      "https://*.org/*/*/pull",
+      "https://*.us/*/*/pull"
     ],
     "includes_glob": [
       "github*"
