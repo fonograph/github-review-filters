@@ -1,9 +1,11 @@
+
 (function ($) {
+  window.$ = $;  
   function GhHelper() {
     var self = this;
-    self.$wrapper = $('body > div.wrapper');
-    self.$header = $('div.wrapper > div.header');
-    self.$content = $('div.wrapper > div.site');
+    self.$wrapper = $('body');
+    self.$header = $('.Header');
+    self.$content = $('.container');
     self.$wrapper.addClass('gh-helper');
 
     self.addMainLink = function (fn, label) {
@@ -42,19 +44,7 @@
       })
       .appendTo(self.$ghHelperNavUlItems);
     };
-
-    self.addMainLegend = function () {
-      $('<li class="header-nav-item"><a class="octicon octicon-info"></a><div id="ghLegend"><div class="arrow"></div><div class="gh-legend-title">GitHub Review Filters</div><div class="gh-legend-label"><div>Visible</div><div>Hidden</div></div><div class="gh-legend-img"></div></div></li>')
-      .appendTo(self.$ghHelperNavUlMain);
-      self.$ghLegend = self.$ghHelperNavUlMain.find('#ghLegend');
-      self.$ghHelperNav.find('.octicon').hover(function () {
-        self.$ghHelperNav.addClass('overflow');
-        self.$ghLegend.fadeIn();
-      }, function () {
-        self.$ghHelperNav.removeClass('overflow');
-        self.$ghLegend.fadeOut();
-      });
-    };
+    
 
     self.addDivider = function () {
       $('<div class="divider-vertical"></div>')
@@ -88,9 +78,7 @@
       self.$ghHelper = $('.gh-helper');
       self.$ghHelperNav = $('#ghHelperNav');
       self.$ghHelperNavUlMain = self.$ghHelperNav.find('div > ul.header-nav.main');
-      self.$ghHelperNavUlItems = self.$ghHelperNav.find('div > ul.header-nav.items');
-      self.$ghLegend = null;
-      self.addMainLegend();
+      self.$ghHelperNavUlItems = self.$ghHelperNav.find('div > ul.header-nav.items');      
       self.addMainLink('showAll', 'Show All');
       self.addMainLink('hideAll', 'Hide All');
       self.update();
@@ -100,14 +88,19 @@
       $('body').on('click', 'a.issue-title-link', function updateClick() {
         self.update();
       });
-      $('body').on('DOMNodeInserted', '.wrapper > .site', function (e) {
-        if (!!e.target.className && (e.target.className.indexOf('view-pull-request') >= 0 || e.target.className.indexOf('issues-listing') >= 0)) {
-          self.update();
+      $('body').on('DOMNodeInserted', function (e) {              
+        if (!!e.target.className && (e.target.className.indexOf('js-diff-progressive-container') >= 0)) {
+          window.clearTimeout(self.updateTimeout);
+          self.updateTimeout = window.setTimeout(function(){
+            self.update();
+          }, 1000);
+          
         }
       });
-    };
+    };  
 
     self.update = function () {
+      console.log('updating');
       var pathname = window.location.pathname.split('/');
       self.isEnterprise = $('body').hasClass('enterprise');
       self.isPulls = pathname[3] === 'pulls' || pathname[3] === 'issues';
@@ -129,6 +122,7 @@
         }
         self.typeIsVisible[itemType] = true;
         self.itemTypes[itemType].push($(this));
+        //console.log($(this).parent(), $(this).data('path'));
       });
       var itemTypes = Object.keys(self.itemTypes);
       if (itemTypes.length) {
