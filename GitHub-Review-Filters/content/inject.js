@@ -1,6 +1,5 @@
 
-(function ($) {
-  window.$ = $;  
+(function ($) {  
   function GhHelper() {
     var self = this;
     self.$wrapper = $('body');
@@ -17,26 +16,18 @@
     };
 
     self.addToggleLink = function (type) {
-      var label = (self.isPulls ? '' : '.') + type;
+      var label = '.' + type;
       $('<li class="header-nav-item toggleLink selected"><a>' + label + ' (' + self.itemTypes[type].length + ')</a></li>')
       .click(function () {
         if (self.typeIsVisible[type]) {
-          self.itemTypes[type].forEach(function (item) {
-            if (self.isPulls) {
-              item.parent().parent().parent().parent().hide();
-            } else {
-              item.parent().hide();
-            }
+          self.itemTypes[type].forEach(function (item) {            
+              item.parent().hide();            
           });
           self.typeIsVisible[type] = false;
           $(this).removeClass('selected');
         } else {
-          self.itemTypes[type].forEach(function (item) {
-            if (self.isPulls) {
-              item.parent().parent().parent().parent().show();
-            } else {
-              item.parent().show();
-            }
+          self.itemTypes[type].forEach(function (item) {            
+              item.parent().show();            
           });
           self.typeIsVisible[type] = true;
           $(this).addClass('selected');
@@ -69,8 +60,7 @@
 
     self.init = function () {
       var pathname = window.location.pathname.split('/');
-      self.isEnterprise = $('body').hasClass('enterprise');
-      self.isPulls = pathname[3] === 'pulls';
+      self.isEnterprise = $('body').hasClass('enterprise');      
       self.itemTypes = {};
       self.searchStr = 'div.meta[data-path]';
       self.typeIsVisible = {};
@@ -102,21 +92,15 @@
     self.update = function () {
       console.log('updating');
       var pathname = window.location.pathname.split('/');
-      self.isEnterprise = $('body').hasClass('enterprise');
-      self.isPulls = pathname[3] === 'pulls' || pathname[3] === 'issues';
+      self.isEnterprise = $('body').hasClass('enterprise');      
       self.itemTypes = {};
       self.searchStr = 'div[data-path]';
       self.allItemsSearchStr = 'div[data-path]';
       self.typeIsVisible = {};
       self.$ghHelperNavUlItems.find('li.toggleLink').remove();
-      if (self.isPulls) {
-        // List of pull requests grouped by user's github handle
-        self.searchStr = '.opened-by > a';
-        self.allItemsSearchStr = 'ul.table-list-issues > li.table-list-item > .issue-title';
-      }
       self.$allItems = $(self.allItemsSearchStr);
       $(self.searchStr).each(function () {
-        var itemType = self.isPulls ? $(this).text().trim() : $(this).attr('data-path').split('.').pop();
+        var itemType = $(this).attr('data-path').split('.').pop();
         if (!self.itemTypes.hasOwnProperty(itemType)) {
           self.itemTypes[itemType] = [];
         }
