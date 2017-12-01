@@ -37,6 +37,7 @@
   "permissions": [
     "https://*.com/*/*/pull*",
     "https://*.org/*/*/pull*",
-    "https://*.us/*/*/pull*"
+    "https://*.us/*/*/pull*",
+    "storage"
   ]
 }

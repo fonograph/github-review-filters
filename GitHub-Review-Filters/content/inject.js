@@ -6,6 +6,7 @@
     self.$header = $('.Header');
     self.$content = $('.container');
     self.$wrapper.addClass('gh-helper');
+    self.savedSettings = {};
 
     self.addMainLink = function (fn, label) {
       $('<li class="header-nav-item"><a>' + label + '</a></li>')
@@ -16,8 +17,8 @@
     };
 
     self.addToggleLink = function (type) {
-      var label = '.' + type;
-      $('<li class="header-nav-item toggleLink selected"><a>' + label + ' (' + self.itemTypes[type].length + ')</a></li>')
+      var label = '.' + type;    
+      return $('<li class="header-nav-item toggleLink ' + (self.typeIsVisible[type]?'selected':'') + '"><a>' + label + ' (' + self.itemTypes[type].length + ')</a></li>')
       .click(function () {
         if (self.typeIsVisible[type]) {
           self.itemTypes[type].forEach(function (item) {            
@@ -32,6 +33,7 @@
           self.typeIsVisible[type] = true;
           $(this).addClass('selected');
         }
+        self.setSavedTypeIsVisible(type, self.typeIsVisible[type]);
       })
       .appendTo(self.$ghHelperNavUlItems);
     };
@@ -90,7 +92,7 @@
       self.itemTypes = {};
       self.searchStr = 'div[data-path]';
       self.allItemsSearchStr = 'div[data-path]';
-      self.typeIsVisible = {};
+      self.typeIsVisible = self.typeIsVisible || {};
       self.$ghHelperNavUlItems.find('li.toggleLink').remove();
       self.$allItems = $(self.allItemsSearchStr);
       $(self.searchStr).each(function () {
@@ -98,31 +100,49 @@
         if (!self.itemTypes.hasOwnProperty(itemType)) {
           self.itemTypes[itemType] = [];
         }
-        self.typeIsVisible[itemType] = true;
+        if (!self.typeIsVisible.hasOwnProperty(itemType)) {
+          self.typeIsVisible[itemType] = self.getSavedTypeIsVisible(itemType);
+        }
         self.itemTypes[itemType].push($(this));
-        //console.log($(this).parent(), $(this).data('path'));
+
+        if (!self.typeIsVisible[itemType]) {
+          self.itemTypes[itemType].forEach(function (item) {            
+              item.parent().hide();            
+          });
+        }        
       });
       var itemTypes = Object.keys(self.itemTypes);
       if (itemTypes.length) {
         itemTypes.forEach(function (itemType) {
-          self.addToggleLink(itemType);
-        });
-        setTimeout(function () {
-          self.$ghHelperNav.addClass('active');
-        }, 400);
+          self.addToggleLink(itemType);          
+        });        
+        self.$ghHelperNav.addClass('active');       
       } else {
         self.$ghHelperNav.removeClass('active overflow');
       }      
     };
 
-    self.init();
+    self.setSavedTypeIsVisible = function(type, isVisible) {      
+      self.savedSettings[type] = isVisible;      
+      chrome.storage.local.set({'settings': self.savedSettings}, function(){console.log('saved complete', chrome.runtime.lastError)});        
+    };
+
+    self.getSavedTypeIsVisible = function(type) {      
+      return self.savedSettings[type] !== undefined ? self.savedSettings[type] : true;        
+    };
+  
+    chrome.storage.local.get('settings', function(items){
+      self.savedSettings = items['settings'] || {};          
+      console.log(self.savedSettings);  
+      self.init();      
+    });
+    
 
   }
   $(document).ready(function () {
     var ghHelper = new GhHelper();
     $(window).bind('popstate', function () {
       ghHelper.update();
-    });
-    ghHelper.update();
+    });    
   });
 }(jQuery));
