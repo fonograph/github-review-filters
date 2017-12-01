@@ -1,3 +1,11 @@
+#ghHelperNav { 
+  display: none;
+}
+
+#ghHelperNav.active {
+  display: block;
+}
+
 #ghHelperNav .header-nav {
   display: inline-block;
 }

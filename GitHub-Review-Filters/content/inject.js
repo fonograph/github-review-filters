@@ -1,5 +1,10 @@
-
 (function ($) {  
+
+  //check for github     
+  if (!(window.location.hostname.indexOf('github.com') >= 0)) {
+    return;
+  }
+
   function GhHelper() {
     var self = this;
     self.$wrapper = $('body');
@@ -71,19 +76,13 @@
       self.$ghHelperNavUlItems = self.$ghHelperNav.find('div > ul.header-nav.items');      
       self.addMainLink('showAll', 'Show All');
       self.addMainLink('hideAll', 'Hide All');
-      self.update();
-      $('body').on('click', 'a.js-pull-request-tab', function updateClick() {
-        self.update();
-      });
-      $('body').on('click', 'a.issue-title-link', function updateClick() {
-        self.update();
-      });
+      self.update();      
       $('body').on('DOMNodeInserted', function (e) {              
-        if (!!e.target.className && (e.target.className.indexOf('js-diff-progressive-container') >= 0)) {
+        if (!!e.target.className && (e.target.className.indexOf('js-diff-progressive-container') >= 0 || e.target.className.indexOf('pagehead') >= 0)) {
           window.clearTimeout(self.updateTimeout);
           self.updateTimeout = window.setTimeout(function(){
             self.update();
-          }, 1000);
+          }, 500);
           
         }
       });
@@ -118,7 +117,7 @@
         }, 400);
       } else {
         self.$ghHelperNav.removeClass('active overflow');
-      }
+      }      
     };
 
     self.init();
